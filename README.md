@@ -1,2 +1,19 @@
-# energy_market_simulation
-A tool to simulate an Energy Market. Generates quantities and prices based on various input parameters and price aggregation function.
+# Energy Market Simulation Tool
+
+Inputs 
+
+1. Number of buyers
+2. Number of sellers
+3. Buyer Parameters - Mean and Standard Deviation
+4. Seller Parameters - Mean and Standard Deviation
+5. Buyer Loads - Mean and Standard Deviation
+6. Price Aggregration Function
+7. Price Learning Rate - Alpha
+
+Outputs 
+
+1. Buyer and Seller Quantities
+2. Initial Buyer Prices
+3. Final Buyer Prices
+4. Final Market Price
+
