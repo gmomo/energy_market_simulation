@@ -78,6 +78,7 @@ class Ui(QtWidgets.QMainWindow):
         ys_sigma = self.ys_sigma.text()
         price_func = self.price_combo.currentText()
         alpha_t = self.alpha_text.text()
+        beta_t = self.beta_text.text()
         
         self.results.append("Running Energy Auction Simulation.")
         self.results.append("Buyers:" + n_b)
@@ -85,10 +86,10 @@ class Ui(QtWidgets.QMainWindow):
         self.results.append("Price Aggregration:" + price_func)
         self.results.append("Alpha:" + alpha_t)
         
-        self.simul(n_b,n_s,load_mean,load_sigma,cb_mean,cb_sigma,db_mean,db_sigma,xs_mean,xs_sigma,ys_mean,ys_sigma,price_func,alpha_t)
+        self.simul(n_b,n_s,load_mean,load_sigma,cb_mean,cb_sigma,db_mean,db_sigma,xs_mean,xs_sigma,ys_mean,ys_sigma,price_func,alpha_t,beta_t)
         #QtWidgets.QMessageBox.about(self, "Title", n_b)
     
-    def simul(self,n_b,n_s,load_mean,load_sigma,cb_mean,cb_sigma,db_mean,db_sigma,xs_mean,xs_sigma,ys_mean,ys_sigma,price_func,alpha_t):
+    def simul(self,n_b,n_s,load_mean,load_sigma,cb_mean,cb_sigma,db_mean,db_sigma,xs_mean,xs_sigma,ys_mean,ys_sigma,price_func,alpha_t,beta_t):
         
         prices = np.zeros(int(n_b))
         quants_b = np.random.normal(float(load_mean),float(load_sigma),int(n_b))
@@ -108,14 +109,17 @@ class Ui(QtWidgets.QMainWindow):
         xs_arr = np.random.normal(float(xs_mean),float(xs_sigma),int(n_s))
         ys_arr = np.random.normal(float(ys_mean),float(ys_sigma),int(n_s))
         
+        for i in range(0,int(n_s)):
+            quants_s[i] = (market_price - xs_arr[i])/ys_arr[i]
+        quants_s[quants_s < 0] = 0
+        
         while(np.sum(quants_b) > np.sum(quants_s)):
             
-            for i in range(0,int(n_s)):
-                quants_s[i] = (market_price - xs_arr[i])/ys_arr[i]
-                
+            quants_s = self.quant_upd_seller(quants_s,beta_t)
+            
             quants_s[quants_s < 0] = 0
             
-            prices = self.price_upd(prices,market_price,alpha_t)
+            prices = self.price_upd_buyer(prices,market_price,alpha_t)
             market_price = self.price_agg(prices,quants_b,price_func)
             QtWidgets.QMessageBox.about(self, "Prices", str(prices) + "Prices")
         
@@ -123,13 +127,23 @@ class Ui(QtWidgets.QMainWindow):
         self.results.append("Final Market Price:" + str(market_price))
         self.results.append("Seller Quantities:" + str(quants_s))
         
-    def price_upd(self,prices,market_price,alpha_t):
+    def price_upd_buyer(self,prices,market_price,alpha_t):
         
         alpha = float(alpha_t)
         for i in range(0,len(prices)):
-            prices[i] = prices[i] + alpha*abs(market_price - prices[i])/prices[i] 
+            prices[i] = prices[i] + alpha*(market_price - prices[i])/prices[i] 
 
         return prices
+    
+    def quant_upd_seller(self,quants_s,beta_t):
+        
+        beta = float(beta_t)
+        mean_quant = np.mean(np.array(quants_s))
+        for i in range(0,len(quants_s)):
+            if(quants_s[i] > 0):
+                quants_s[i] = quants_s[i] + beta*(mean_quant - quants_s[i])/quants_s[i] 
+
+        return quants_s
 
     def price_agg(self,prices,quants_b,price_func):
         
