@@ -9,6 +9,7 @@ Inputs
 5. Buyer Loads - Mean and Standard Deviation
 6. Price Aggregration Function
 7. Price Learning Rate - Alpha
+8. Quantity Learning Rate - Beta
 
 Outputs 
 
