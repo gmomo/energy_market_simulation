@@ -18,4 +18,4 @@ Outputs
 3. Final Buyer Prices
 4. Final Market Price
 
-![alt text](https://github.com/gmomo/energy_market_simulation/blob/master/Software.png)
+![alt text](https://github.com/gmomo/energy_market_simulation/blob/master/Sofware.png)
